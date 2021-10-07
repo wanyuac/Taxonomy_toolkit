@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Extract the top-three taxa and their read fractions from bracken's tsv-formatted output for each sample. The bracken reports must
+Extract the top-three taxa and their read percentages from bracken's tsv-formatted output for each sample. The bracken reports must
 be generated at the same level (such as 'S'), and each report must have at least three taxa.
 
 Command:
@@ -29,17 +29,17 @@ def parse_argument():
 def main():
     args = parse_argument()
     samples = read_sample_names(args.list)
-    report = pandas.DataFrame(columns = ['Sample', 'Taxon_1', 'Taxon_2', 'Taxon_3', 'Perc_1', 'Perc_2', 'Perc_3'])
+    report = pandas.DataFrame(columns = ['Sample', 'Taxon_1', 'Taxon_2', 'Taxon_3', 'Percent_1', 'Percent_2', 'Percent_3'])
     for s in samples:
         bracken = read_bracken_report(os.path.join(args.dir, s + args.suffix))
         r1 = bracken.loc[0]  # Not use bracken.loc[0]['taxon'] or bracken.loc[0]['fraction'] to reduce the number of searching for indices.
         r2 = bracken.loc[1]
         r3 = bracken.loc[2]
         new_line = pandas.DataFrame({'Sample' : [s], 'Taxon_1' : [r1['taxon']], 'Taxon_2' : [r2['taxon']], 'Taxon_3' : [r3['taxon']],\
-                                     'Perc_1' : [float(r1['fraction']) * 100], 'Perc_2' : [float(r2['fraction']) * 100],\
-                                     'Perc_3' : [float(r3['fraction']) * 100]})
+                                     'Percent_1' : [float(r1['fraction']) * 100], 'Percent_2' : [float(r2['fraction']) * 100],\
+                                     'Percent_3' : [float(r3['fraction']) * 100]})
         report = report.append(new_line)
-    report.to_csv(args.out, header = True, index = False, sep = '\t')
+    report.to_csv(args.out, header = True, index = False, sep = '\t', float_format = '%.3f')
     return
 
 def read_sample_names(f):

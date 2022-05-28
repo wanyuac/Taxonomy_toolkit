@@ -1,6 +1,4 @@
-# Kraken\_tools
-Scripts facilitating taxonomical analysis using kraken 2 and bracken.
-
+# Scripts facilitating taxonomical analysis using Kraken 2 and Bracken
 By Yu Wan
 
 Latest update of documentation: 28 May 2022
@@ -18,7 +16,7 @@ Code in this repository has been tested under the following settings. However, t
 <br/>
 ## 1. Prerequisite
 
-Solving Issues [508](https://github.com/DerrickWood/kraken2/issues/508) and [518](https://github.com/DerrickWood/kraken2/issues/518): "`rsync_from_ncbi.pl: unexpected FTP path (new server?)`)"
+Updating script `rsync_from_ncbi.pl` of Kraken2 to solve Issues [508](https://github.com/DerrickWood/kraken2/issues/508) and [518](https://github.com/DerrickWood/kraken2/issues/518): "`rsync_from_ncbi.pl: unexpected FTP path (new server?)`)"
 
 - Replace `rsync_from_ncbi.pl` in `kraken2.1/libexec` in Kraken2's installation directory. For anaconda users, the path is: `$HOME/anaconda3/envs/[kraken environment name]/libexec`.
 

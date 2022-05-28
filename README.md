@@ -24,7 +24,7 @@ Solving Issues [508](https://github.com/DerrickWood/kraken2/issues/508) and [518
 
 <br/>
 
-## 2. Building Kraken taxonomical and sequence databases
+## 2. Building a Kraken database
 
 - `build_kraken_database.pbs`
 - Example: `qsub -v "conda_module=anaconda3/personal,env=kraken2.1,lib=bacteria,db=bacteria_220526,wd=$PWD" ~/Kraken_toolkit/build_database.pbs*`

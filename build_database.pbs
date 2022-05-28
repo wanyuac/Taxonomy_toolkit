@@ -1,0 +1,45 @@
+#!/bin/bash
+#PBS -l select=1:ncpus=8:mem=64gb:ompthreads=8
+#PBS -l walltime=48:00:00
+#PBS -j oe
+#
+# This script builds a custome Kraken database.
+# Parameters: conda_module (module name for loading conda), env (conda environment), library (bacteria, etc), db (database name), wd (working directory), 
+# Dependencies: conda (anaconda/miniconda), Kraken 2, PBS
+# Example command: qsub -v "conda_module=anaconda3/personal,env=kraken2.1,lib=bacteria,db=bacteria_220526,wd=$PWD" ~/Kraken_toolkit/build_database.pbs
+#
+# Copyright (C) 2020-2022 Yu Wan <wanyuac@126.com>
+# Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
+# First release: 2021; latest update: 28 May 2022
+
+if [ ! -z "$conda_module"]; then
+    module load "$conda_module"
+fi
+
+if [ ! -z "$env" ]; then  # Comment/uncomment the command 'source activate' or 'conda activate' for your HPC's setting
+    source activate $env  # Includes an openmpi installation from bioconda
+    # conda activate $env
+fi
+
+if [ ! -z "$lib" ]; then
+    echo "Warning: No library is specified, so this script uses 'bacteria'."
+    lib='bacteria'
+fi
+
+cd $wd
+
+#echo "Deleting the previous database"
+#if [ -d $db ]; then
+#    rm -rf $db
+#fi
+
+echo -e "Using $NCPUS cores to build $db in $wd\n"
+echo -e "Download taxonomy\n"
+kraken2-build --download-taxonomy --db $db
+
+echo -e "Downloading the bacterial library\n"
+#kraken2-build --download-library bacteria --use-ftp --db $db
+kraken2-build --download-library $lib --db $db  # This command does not affect files in directory 'taxonomy'
+
+echo -e "Building the bacterial database"
+kraken2-build --build --threads $NCPUS --db $db

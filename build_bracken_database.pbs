@@ -1,0 +1,45 @@
+#!/bin/bash
+# This script builds a Bracken database from a Kraken2 database.
+# Parameters: db (path to a Kraken database), len (read length), k (k-mer length), wd (working directory),
+#             x (path to the 'bin' subdirectory in Kraken2's installation directory),
+#             p (directory where Bracken is installed)
+# Example command: qsub -v "k=35,len=150,db=$HOME/database/kraken2/bacteria_220526,x=$HOME/anaconda3/envs/kraken2.1/bin,p=$HOME/bin/Bracken" build_bracken_database.pbs
+#
+# Copyright (C) 2020-2022 Yu Wan <wanyuac@126.com>
+# Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
+# Release: 2020; latest update: 28 May 2022
+
+### Job configurations ###############
+#PBS -N bracken-build
+#PBS -l select=1:ncpus=8:mem=64gb:ompthreads=8
+#PBS -l walltime=24:00:00
+#PBS -j oe
+
+if [ -z "$k" ]; then
+    echo "Waring: parameter 'k' is not specified, so k = 35 is used by default."
+    k=35
+fi
+
+if [ -z "len" ]; then
+    echo "Warning: parameter 'len' is not specified, so len = 100 is used by default."
+    len=100
+fi
+
+if [ ! -f "$p/bracken-build" ]; then
+    if [ -f "./bracken-build" ]; then
+        p='.'
+    else
+        echo "Error: bracken-build is not found in directory $p"
+        exit 1
+    fi
+fi
+
+### Main ###############
+cd $wd
+
+if [ ! -z "$db" ]; then
+    echo "Building a Bracken database (k-mer = $k, read length = $len) from $db using $NCPUS cores."
+    $p/bracken-build -k $k -l $len -d $db -x $x -t $NCPUS
+else
+    echo "Error: no Kraken2 database is specified for variable 'db'."
+fi

@@ -10,7 +10,7 @@ Dependencies: Python 3, pandas, bracken v2.6+
 
 Copyright (C) 2021 Yu Wan <wanyuac@126.com>
 Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-Creation: 7 Oct 2021; the latest update: 7 Oct 2021
+Creation: 7 Oct 2021; the latest update: 3 June 2022
 """
 
 import os
@@ -29,7 +29,7 @@ def parse_argument():
 def main():
     args = parse_argument()
     samples = read_sample_names(args.list)
-    report = pandas.DataFrame(columns = ['Sample', 'Taxon_1', 'Taxon_2', 'Taxon_3', 'Percent_1', 'Percent_2', 'Percent_3'])
+    report = pandas.DataFrame(columns = ['Sample', 'Taxon_1', 'Taxon_2', 'Taxon_3', 'Percent_1', 'Percent_2', 'Percent_3'])  # Initiate the output data frame
     for s in samples:
         bracken = read_bracken_report(os.path.join(args.dir, s + args.suffix))
         r1 = bracken.loc[0]  # Not use bracken.loc[0]['taxon'] or bracken.loc[0]['fraction'] to reduce the number of searching for indices.
@@ -38,8 +38,8 @@ def main():
         new_line = pandas.DataFrame({'Sample' : [s], 'Taxon_1' : [r1['taxon']], 'Taxon_2' : [r2['taxon']], 'Taxon_3' : [r3['taxon']],\
                                      'Percent_1' : [float(r1['fraction']) * 100], 'Percent_2' : [float(r2['fraction']) * 100],\
                                      'Percent_3' : [float(r3['fraction']) * 100]})
-        report = report.append(new_line)
-    report.to_csv(args.out, header = True, index = False, sep = '\t', float_format = '%.3f')
+        report = pandas.concat([report, new_line])  # Replaces the depreciated method report.append(new_line)
+    report.to_csv(args.out, header = True, index = False, sep = '\t', float_format = '%.2f')
     return
 
 def read_sample_names(f):

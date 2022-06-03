@@ -19,7 +19,7 @@ the first item in the file list provided by --fastq ./reads/*_{1,2}.fastq.gz, ca
 [Declarations]
 Copyright (C) 2020-2022 Yu Wan <wanyuac@126.com>
 Licensed under the GNU General Public License v3.0
-Publication: 24 Mar 2020; last modification: 2 June 2022
+Publication: 24 Mar 2020; last modification: 3 June 2022
 */
 
 /*------------------------------------------------------------------------------
@@ -61,50 +61,65 @@ process kraken2 {
     tuple val(genome), file(fastqs)
     
     output:
-    tuple val(genome), path("${genome}_kraken.txt") into kraken_reports
+    tuple val(genome), path("${genome}_kraken.txt")
     
     script:
     """
     module load anaconda3/personal
-    source activate ${params.conda_kraken_env}
+    source activate ${params.conda_env}
     kraken2 --threads ${params.cpus} --db ${params.db} --paired --gzip-compressed --output - --report ${genome}_kraken.txt ${fastqs}
     """
 }
 
 process bracken {
-    publishDir path: "${out_dir}/bracken", mode: "copy", overwrite: true, pattern: "${genome}_bracken.*" // *_bracken.tsv and *_bracken.txt
+    publishDir path: "${out_dir}/bracken", mode: "copy", overwrite: true, pattern: "${genome}_bracken.tsv"
+    publishDir path: "${out_dir}/bracken", mode: "copy", overwrite: true, pattern: "${genome}_bracken.txt"
     label "PBS"
     executor "pbs"
     clusterOptions "-N Bracken"
 
     input:
-    tuple val(genome), path("${genome}_kraken.txt") from kraken_reports
+    tuple val(genome), path("${genome}_kraken.txt")
 
     output:
-    val genome into processed_genomes
+    val genome, emit: genome_name
+    path "${genome}_bracken.tsv"  // Output paths must be declared or the corresponding files will not be copied to the published directory.
+    path "${genome}_bracken.txt"
 
     script:
     """
+    module load anaconda3/personal
+    source activate ${params.conda_env}
     ${params.bracken_dir}/bracken -d ${params.db} -i ${genome}_kraken.txt -o ${genome}_bracken.tsv -w ${genome}_bracken.txt -l S -r ${params.read_len} -t ${params.cpus}
     """
 }
 
 process compile_reports {  // This process requires Python
-    publishDir path: ${outd_ir}, mode: "copy", overwrite: true, pattern: "top3_taxa.tsv"
+    publishDir path: "$out_dir", mode: "copy", overwrite: true, pattern: "top3_taxa.tsv"
     executor "local"
 
     input:
-    val genomes from processed_genomes.collect()  // Triggers this process when all genome names are gathered
+    val genomes  // Triggers this process when all genome names are gathered (see 'workflow')
+
+    output:
+    path "top3_taxa.tsv"
 
     script:
     genome_list = file("genome_list.txt")  // A file object
+    if (genome_list.exists()) {
+        genome_list.delete()
+    }
     for (g : genomes) {
         genome_list.append("${g}\n")
     }
     /* """
     ls -1 ${out_dir}/bracken/*_bracken.tsv | xargs -I {} basename {} '_bracken.tsv' > genome_list.txt */
     """
-    python ${script_dir}/top3_bracken_taxa.py -l ${genome_list} -d ${out_dir}/bracken -s '_bracken.tsv' -o top3_taxa.tsv
+    module load anaconda3/personal
+    set +eu  # To solve the issue '/rds/general/user/ywan1/home/anaconda3/etc/profile.d/conda.sh: line 55: PS1: unbound variable' (github.com/conda/conda/issues/8186)
+    source activate ${params.conda_env}
+    set -eu
+    python ${params.script_dir}/top3_bracken_taxa.py -l ${genome_list} -d ${out_dir}/bracken -s '_bracken.tsv' -o "top3_taxa.tsv"
     """
 }
 
@@ -113,6 +128,6 @@ process compile_reports {  // This process requires Python
 ------------------------------------------------------------------------------*/
 workflow {
     kraken2(Channel.fromFilePairs(params.fastq))
-    bracken()
-    compile_reports()
+    bracken(kraken2.out)
+    compile_reports(bracken.out.genome_name.collect())
 }

@@ -4,7 +4,7 @@ Extract the top-three taxa and their read percentages from bracken's tsv-formatt
 be generated at the same level (such as 'S'), and each report must have at least three taxa.
 
 Command:
-    python top3brackenTaxa.py -l [list of sample names] -d [directory of input bracken reports] -s [suffix of bracken reports] -o [output file name]
+    python top3BrackenTaxa.py -l [list of sample names] -d [directory of input bracken reports] -s [suffix of Bracken reports] -o [output file name]
 
 Dependencies: Python 3, pandas, bracken v2.6+
 
@@ -19,9 +19,9 @@ import pandas
 from argparse import ArgumentParser
 
 def parse_argument():
-    parser = ArgumentParser(description = "Extract top-three taxa and their read fractions for each sample from its bracken report")
+    parser = ArgumentParser(description = "Extract top-three taxa and their read fractions for each sample from its TSV-format Bracken report")
     parser.add_argument('-l', '--list', dest = 'list', type = str, required = True, help = "A list of sample names; one name per line.")
-    parser.add_argument('-d', '--dir', dest = 'dir', type = str, required = True, help = "Directory of input bracken reports")
+    parser.add_argument('-d', '--dir', dest = 'dir', type = str, required = True, help = "Directory of input TSV-format Bracken reports")
     parser.add_argument('-s', '--suffix', dest = 'suffix', type = str, required = False, default = '_bracken.tsv', help = "Name of the reference sequence in the alignment")
     parser.add_argument('-o', '--out', dest = 'out', type = str, required = False, default = 'top3taxa.tsv', help = "Output filename and path")
     return parser.parse_args()

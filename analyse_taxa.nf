@@ -7,6 +7,7 @@ Run Kraken2 (installed in a Conda environment) and Bracken over gzip-compressed 
 - Conda
 - Python and the pandas package
 - Bracken v2.6+
+- top3_bracken_taxa.py in github.com/wanyuac/Kraken_toolkit
 
 [Use guide]
 An example command line in a screen session:
@@ -103,7 +104,7 @@ process compile_reports {  // This process requires Python
     /* """
     ls -1 ${out_dir}/bracken/*_bracken.tsv | xargs -I {} basename {} '_bracken.tsv' > genome_list.txt */
     """
-    python ${top3brackenTaxa_dir}/top3BrackenTaxa.py -l ${genome_list} -d ${out_dir}/bracken -s '_bracken.tsv' -o top3_taxa.tsv
+    python ${script_dir}/top3_bracken_taxa.py -l ${genome_list} -d ${out_dir}/bracken -s '_bracken.tsv' -o top3_taxa.tsv
     """
 }
 

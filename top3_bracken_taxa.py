@@ -4,7 +4,7 @@ Extract the top-three taxa and their read percentages from bracken's tsv-formatt
 be generated at the same level (such as 'S'), and each report must have at least three taxa.
 
 Command:
-    python top3BrackenTaxa.py -l [list of sample names] -d [directory of input bracken reports] -s [suffix of Bracken reports] -o [output file name]
+    python top3_bracken_taxa.py -l [list of sample names] -d [directory of input bracken reports] -s [suffix of Bracken reports] -o [output file name]
 
 Dependencies: Python 3, pandas, bracken v2.6+
 

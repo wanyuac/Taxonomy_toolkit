@@ -11,7 +11,7 @@ Code in this repository has been tested under the following settings. However, t
 - Portable Batch System (PBS)
 - Anaconda with package [Kraken](https://github.com/DerrickWood/kraken2) v2.1.2 installed in an environment
 - [Bracken](https://github.com/jenniferlu717/Bracken) v2.6.2 (Standard-alone installation)
-- Python v3 and the pandas package
+- Python v3 and the pandas (<1.4) package
 
 <br/>  
 

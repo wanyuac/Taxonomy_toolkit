@@ -96,7 +96,9 @@ process bracken {
 
 process compile_reports {  // This process requires Python
     publishDir path: "$out_dir", mode: "copy", overwrite: true, pattern: "top3_taxa.tsv"
-    executor "local"
+    label "PBS_light"
+    executor "pbs"  //executor "local"  # Could not get around the issue '/rds/general/user/ywan1/home/anaconda3/etc/profile.d/conda.sh: line 55: PS1: unbound variable' (github.com/conda/conda/issues/8186)
+    clusterOptions "-N Summary"
 
     input:
     val genomes  // Triggers this process when all genome names are gathered (see 'workflow')
@@ -112,13 +114,10 @@ process compile_reports {  // This process requires Python
     for (g : genomes) {
         genome_list.append("${g}\n")
     }
-    /* """
-    ls -1 ${out_dir}/bracken/*_bracken.tsv | xargs -I {} basename {} '_bracken.tsv' > genome_list.txt */
+
     """
     module load anaconda3/personal
-    set +eu  # To solve the issue '/rds/general/user/ywan1/home/anaconda3/etc/profile.d/conda.sh: line 55: PS1: unbound variable' (github.com/conda/conda/issues/8186)
     source activate ${params.conda_env}
-    set -eu
     python ${params.script_dir}/top3_bracken_taxa.py -l ${genome_list} -d ${out_dir}/bracken -s '_bracken.tsv' -o "top3_taxa.tsv"
     """
 }

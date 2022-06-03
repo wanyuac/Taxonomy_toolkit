@@ -1,7 +1,12 @@
 #!/usr/bin/env nextflow
 
 /*
-Run Kraken2 for paired-end read sets.
+Run Kraken2 (installed in a Conda environment) and Bracken over gzip-compressed paired-end read sets for species identification.
+
+[Dependencies]
+- Conda
+- Python and the pandas package
+- Bracken v2.6+
 
 [Use guide]
 An example command line in a screen session:
@@ -11,39 +16,102 @@ Note to use quote signs for paths, particularly, the paths of input read files, 
 the first item in the file list provided by --fastq ./reads/*_{1,2}.fastq.gz, causing an error to run the pipeline. 
 
 [Declarations]
-Copyright (C) 2020 Yu Wan <wanyuac@126.com>
+Copyright (C) 2020-2022 Yu Wan <wanyuac@126.com>
 Licensed under the GNU General Public License v3.0
-Publication: 24 Mar 2020; last modification: 16 Apr 2020
+Publication: 24 Mar 2020; last modification: 2 June 2022
 */
 
-def out_dir = new File(params.outdir)
+/*------------------------------------------------------------------------------
+    Output settings
+------------------------------------------------------------------------------*/
+nextflow.enable.dsl = 2
 
-if ( !out_dir.exists() ) {
-    result = out_dir.mkdir()
-    println result ? "Successfully created directory ${out_dir}" : "Cannot create directory: ${out_dir}"
+def mkdir(dir_path) {  // Creates a directory and returns a File object
+    def dir_obj = new File(dir_path)
+    if ( ! dir_obj.exists() ) {
+        result = dir_obj.mkdir()
+        println result ? "Successfully created directory ${dir_path}" : "Cannot create directory ${dir_path}"
+    } else {
+        println "Directory ${dir_path} exists."
+    }
+    return dir_obj
 }
 
-read_sets = Channel.fromFilePairs(params.fastq)
+def subdirs = ["kraken", "bracken"]  // A list object of subdirectory names
 
+out_dir = mkdir(params.outdir)  // Create the parental output directory
+subdirs.each { mkdir("${out_dir}/${it}") }  // Iterate through the list
+
+/*------------------------------------------------------------------------------
+    Processes
+------------------------------------------------------------------------------*/
 process kraken2 {
     /*
     The "publishDir" statement must be accompanied by the declaration of output in the process in order
     to copy/move output files into the right output directory. Nothing happens if the output is not
     defined even though this is a terminal process.
     */
-    publishDir path: "${out_dir}", mode: "move", overwrite: true
-    
+    publishDir path: "${out_dir}/kraken", mode: "copy", overwrite: true, pattern: "${genome}_kraken.txt"
+    label "PBS"
+    executor "pbs"
+    clusterOptions "-N Kraken2"
+
     input:
-    set genome, file(paired_fastq) from read_sets
+    tuple val(genome), file(fastqs)
     
     output:
-    file("${genome}.txt") into summary_out
-    file("${genome}.kraken") into taxa_out
+    tuple val(genome), path("${genome}_kraken.txt") into kraken_reports
     
     script:
-    
-    // --output: classification output; --report: a summary tree of assigned taxonomy
     """
-    ${params.kraken2Dir}/kraken2 --db ${params.db} --paired --threads 4 --gzip-compressed --output ${genome}.kraken --report ${genome}.txt --classified-out "${genome}_known#.fastq" --unclassified-out "${genome}_unknown#.fastq" ${paired_fastq}
+    module load anaconda3/personal
+    source activate ${params.conda_kraken_env}
+    kraken2 --threads ${params.cpus} --db ${params.db} --paired --gzip-compressed --output - --report ${genome}_kraken.txt ${fastqs}
     """
+}
+
+process bracken {
+    publishDir path: "${out_dir}/bracken", mode: "copy", overwrite: true, pattern: "${genome}_bracken.*" // *_bracken.tsv and *_bracken.txt
+    label "PBS"
+    executor "pbs"
+    clusterOptions "-N Bracken"
+
+    input:
+    tuple val(genome), path("${genome}_kraken.txt") from kraken_reports
+
+    output:
+    val genome into processed_genomes
+
+    script:
+    """
+    ${params.bracken_dir}/bracken -d ${params.db} -i ${genome}_kraken.txt -o ${genome}_bracken.tsv -w ${genome}_bracken.txt -l S -r ${params.read_len} -t ${params.cpus}
+    """
+}
+
+process compile_reports {  // This process requires Python
+    publishDir path: ${outd_ir}, mode: "copy", overwrite: true, pattern: "top3_taxa.tsv"
+    executor "local"
+
+    input:
+    val genomes from processed_genomes.collect()  // Triggers this process when all genome names are gathered
+
+    script:
+    genome_list = file("genome_list.txt")  // A file object
+    for (g : genomes) {
+        genome_list.append("${g}\n")
+    }
+    /* """
+    ls -1 ${out_dir}/bracken/*_bracken.tsv | xargs -I {} basename {} '_bracken.tsv' > genome_list.txt */
+    """
+    python ${top3brackenTaxa_dir}/top3brackenTaxa.py -l ${genome_list} -d ${out_dir}/bracken -s '_bracken.tsv' -o top3_taxa.tsv
+    """
+}
+
+/*------------------------------------------------------------------------------
+    Workflow 
+------------------------------------------------------------------------------*/
+workflow {
+    kraken2(Channel.fromFilePairs(params.fastq))
+    bracken()
+    compile_reports()
 }

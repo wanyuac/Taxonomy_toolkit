@@ -103,7 +103,7 @@ process compile_reports {  // This process requires Python
     /* """
     ls -1 ${out_dir}/bracken/*_bracken.tsv | xargs -I {} basename {} '_bracken.tsv' > genome_list.txt */
     """
-    python ${top3brackenTaxa_dir}/top3brackenTaxa.py -l ${genome_list} -d ${out_dir}/bracken -s '_bracken.tsv' -o top3_taxa.tsv
+    python ${top3brackenTaxa_dir}/top3BrackenTaxa.py -l ${genome_list} -d ${out_dir}/bracken -s '_bracken.tsv' -o top3_taxa.tsv
     """
 }
 

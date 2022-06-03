@@ -1,0 +1,35 @@
+#!/bin/bash
+# This script builds a custome Kraken database.
+# Parameters: conda_module (module name for loading conda), env (conda environment), db (database name and path), wd (working directory), 
+# Dependencies: conda (anaconda/miniconda), Kraken 2, PBS
+# Example command: qsub -v "conda_module=anaconda3/personal,env=kraken2.1,db=bacteria_220526,wd=$PWD" ~/Kraken_toolkit/inspect_kraken2_database.pbs
+#
+# Copyright (C) 2020-2022 Yu Wan <wanyuac@126.com>
+# Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
+# First release: 3 June 2022; latest update: 3 June 2022
+
+### Job configurations ###############
+#PBS -N kraken2-inspect
+#PBS -l select=1:ncpus=8:mem=64gb:ompthreads=8
+#PBS -l walltime=24:00:00
+#PBS -j oe
+
+if [ ! -z "$conda_module" ]; then
+    module load $conda_module
+fi
+
+if [ ! -z "$env" ]; then  # Comment/uncomment the command 'source activate' or 'conda activate' for your HPC's setting
+    source activate $env  # Includes an openmpi installation from bioconda
+    # conda activate $env
+fi
+
+if [ -z "$db" ]; then
+    echo "Warning: the Kraken2 database is not found."
+    exit 1
+fi
+
+### Main ###############
+cd $wd
+
+echo "Running kraken2-inspect with $NCPUS cores."
+kraken2-inspect --db $db --threads $NCPUS > ${db}_summary.txt

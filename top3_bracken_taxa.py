@@ -6,7 +6,7 @@ be generated at the same level (such as 'S'), and each report must have at least
 Command:
     python top3_bracken_taxa.py -l [list of sample names] -d [directory of input bracken reports] -s [suffix of Bracken reports] -o [output file name]
 
-Dependencies: Python 3, pandas, bracken v2.6+
+Dependencies: Python 3, pandas (<1.4.0 - recommend to use v1.3.5), bracken v2.6+
 
 Copyright (C) 2021 Yu Wan <wanyuac@126.com>
 Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
@@ -36,10 +36,9 @@ def main():
         r2 = bracken.loc[1]
         r3 = bracken.loc[2]
         new_line = pandas.DataFrame({'Sample' : [s], 'Taxon_1' : [r1['taxon']], 'Taxon_2' : [r2['taxon']], 'Taxon_3' : [r3['taxon']],\
-                                     'Percent_1' : [float(r1['fraction']) * 100], 'Percent_2' : [float(r2['fraction']) * 100],\
-                                     'Percent_3' : [float(r3['fraction']) * 100]})
-        report = pandas.concat([report, new_line])  # Replaces the depreciated method report.append(new_line)
-    report.to_csv(args.out, header = True, index = False, sep = '\t', float_format = '%.2f')
+                                     'Percent_1' : [float(r1['fraction'] * 100)], 'Percent_2' : [float(r2['fraction'] * 100)], 'Percent_3' : [float(r3['fraction'] * 100)]})
+        report = pandas.concat([report, new_line], ignore_index = True)  # Replaces the depreciated method report.append(new_line)
+    report.to_csv(args.out, float_format = '%.3f', sep = '\t', header = True, index = False)  # float_format does not work on pandas v1.4.0+.
     return
 
 def read_sample_names(f):

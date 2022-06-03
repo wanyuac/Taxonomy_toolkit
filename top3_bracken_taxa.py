@@ -6,7 +6,7 @@ be generated at the same level (such as 'S'), and each report must have at least
 Command:
     python top3_bracken_taxa.py -l [list of sample names] -d [directory of input bracken reports] -s [suffix of Bracken reports] -o [output file name]
 
-Dependencies: Python 3, pandas (<1.4.0 - recommend to use v1.3.5), bracken v2.6+
+Dependencies: Python 3, pandas (<1.4.0 - recommend to use v1.3), bracken v2.6+
 
 Copyright (C) 2021 Yu Wan <wanyuac@126.com>
 Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.

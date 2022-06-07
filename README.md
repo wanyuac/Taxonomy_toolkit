@@ -1,7 +1,10 @@
-# Scripts facilitating taxonomical analysis using Kraken 2 and Bracken
-By Yu Wan
-
-<br/>  
+# Scripts facilitating taxonomical analysis
+By Yu Wan  
+<br/>
+Pipelines
+- Kraken 2 and Bracken
+- KmerFinder
+<br/>
 
 ## System settings
 

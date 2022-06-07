@@ -11,7 +11,7 @@ Run Kraken2 (installed in a Conda environment) and Bracken over gzip-compressed 
 
 [Use guide]
 An example command line in a screen session:
-nextflow -Djava.io.tmpdir=$PWD run kraken2.nf --db "./bacteria" --kraken2Dir "./kraken2/bin" --outdir "${PWD}/report" --fastq "./reads/*_{1,2}.fastq.gz" --queueSize 35 -c kraken2.config -profile pbs
+nextflow -Djava.io.tmpdir=$PWD run kraken2.nf --db "./bacteria" --kraken2Dir "./kraken2/bin" --outdir "${PWD}/report" --fastq "./reads/*_{1,2}.fastq.gz" --queueSize 5 -c kraken2.config
 
 Note to use quote signs for paths, particularly, the paths of input read files, in this command line. Nextflow only reads
 the first item in the file list provided by --fastq ./reads/*_{1,2}.fastq.gz, causing an error to run the pipeline. 
@@ -19,7 +19,7 @@ the first item in the file list provided by --fastq ./reads/*_{1,2}.fastq.gz, ca
 [Declarations]
 Copyright (C) 2020-2022 Yu Wan <wanyuac@126.com>
 Licensed under the GNU General Public License v3.0
-Publication: 24 Mar 2020; last modification: 3 June 2022
+Publication: 24 Mar 2020; last modification: 7 June 2022
 */
 
 /*------------------------------------------------------------------------------
@@ -27,16 +27,7 @@ Publication: 24 Mar 2020; last modification: 3 June 2022
 ------------------------------------------------------------------------------*/
 nextflow.enable.dsl = 2
 
-def mkdir(dir_path) {  // Creates a directory and returns a File object
-    def dir_obj = new File(dir_path)
-    if ( ! dir_obj.exists() ) {
-        result = dir_obj.mkdir()
-        println result ? "Successfully created directory ${dir_path}" : "Cannot create directory ${dir_path}"
-    } else {
-        println "Directory ${dir_path} exists."
-    }
-    return dir_obj
-}
+include { mkdir } from "./module"
 
 def subdirs = ["kraken", "bracken"]  // A list object of subdirectory names
 

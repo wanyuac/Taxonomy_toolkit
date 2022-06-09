@@ -48,7 +48,7 @@ I recommend running the pipeline in a screen session on your HPC.
 
 ```bash
 # mkdir tmp
-nextflow -Djava.io.tmpdir=tmp run analyse_taxa.nf -c analyse_taxa.config --fastq "*_{1,2}.fastq.gz" --db /rds/general/project/hrpu2wgs/live/imp/database/kraken2/bacteria_220526 --outdir "output" --queueSize 10 --cpus 8 --mem 64 --conda_env kraken2.1 --bracken_dir $HOME/software/Bracken --read_len 150 --script_dir $PWD
+nextflow -Djava.io.tmpdir=tmp run kraken2.nf -c kraken2.config --fastq "*_{1,2}.fastq.gz" --db $HOME/database/kraken2/bacteria_220526 --outdir "output" --queueSize 10 --cpus 8 --mem 64 --conda_env kraken2.1 --bracken_dir $HOME/software/Bracken --read_len 150 --script_dir $PWD
 ```
 
 Note that `-Djava.io.tmpdir=tmp` is not necessary if you have access to `/tmp`.

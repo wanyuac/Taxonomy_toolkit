@@ -15,7 +15,7 @@ nextflow -Djava.io.tmpdir=$PWD run kmerfinder.nf --db "$HOME/databases/kmerfinde
 [Declarations]
 Copyright (C) 2020-2022 Yu Wan <wanyuac@126.com>
 Licensed under the GNU General Public License v3.0
-Publication: 7 June 2022; last modification: 7 June 2022
+Publication: 7 June 2022; last modification: 9 June 2022
 */
 
 /*------------------------------------------------------------------------------
@@ -27,17 +27,28 @@ include { mkdir } from "./module"
 
 out_dir = mkdir(params.outdir)
 
-fasta_in = Channel.fromPath(params.fasta, type: "file").map { tuple(it.name.split('.')[0], it) }
+fasta_in = Channel.fromPath(params.fasta, type: "file").map { file -> tuple(file.baseName, file) }  // Imports the path and removes the filename extension (.fasta); www.nextflow.io/docs/latest/faq.html#how-do-i-get-a-unique-id-based-on-the-file-name
 
 process kmerfinder {
-    publishDir path: "$out_dir", mode: "copy", overwrite: true, pattern: "data.json"
-    publishDir path: "$out_dir", mode: "copy", overwrite: true, pattern: "results.spa"
-    publishDir path: "$out_dir", mode: "copy", overwrite: true, pattern: "results.txt"
-    executor "pbs"
-    clusterOptions "-N KmerFinder"
+    publishDir path: "$out_dir", mode: "copy", overwrite: true, pattern: "data.json", saveAs: { filename -> "${isolate}.json" }
+    publishDir path: "$out_dir", mode: "copy", overwrite: true, pattern: "results.spa", saveAs: { filename -> "${isolate}.spa" }
+    publishDir path: "$out_dir", mode: "copy", overwrite: true, pattern: "results.txt", saveAs: { filename -> "${isolate}.txt" }
+    executor "pbs"  // Do not put clusterOptions here as it overrides the one in the config file. Further, Nextflow generates a name for each job automatically, so do not need to add 'clusterOptions -N kmerfinder' here.
 
     input:
-    tuple val(isolate), path(fasta)
+    tuple val(isolate), path(assembly)
+
+    output:
+    path "data.json"
+    path "results.spa"
+    path "results.txt"
+
+    script:
+    """
+    module load anaconda3/personal
+    source activate ${params.conda_env}
+    python ${params.kmerfinder_dir}/kmerfinder.py -i ${assembly} --output_folder . -db ${params.db} --tax ${params.tax} --kma_path ${params.kma_dir}
+    """
 }
 
 /*------------------------------------------------------------------------------

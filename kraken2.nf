@@ -46,8 +46,7 @@ process kraken2 {
     publishDir path: "${out_dir}/kraken", mode: "copy", overwrite: true, pattern: "${genome}_kraken.txt"
     label "PBS"
     executor "pbs"
-    clusterOptions "-N Kraken2"
-
+    
     input:
     tuple val(genome), file(fastqs)
     
@@ -67,8 +66,7 @@ process bracken {
     publishDir path: "${out_dir}/bracken", mode: "copy", overwrite: true, pattern: "${genome}_bracken.txt"
     label "PBS"
     executor "pbs"
-    clusterOptions "-N Bracken"
-
+    
     input:
     tuple val(genome), path("${genome}_kraken.txt")
 
@@ -89,8 +87,7 @@ process compile_reports {  // This process requires Python
     publishDir path: "$out_dir", mode: "copy", overwrite: true, pattern: "top3_taxa.tsv"
     label "PBS_light"
     executor "pbs"  //executor "local"  # Could not get around the issue '/rds/general/user/ywan1/home/anaconda3/etc/profile.d/conda.sh: line 55: PS1: unbound variable' (github.com/conda/conda/issues/8186)
-    clusterOptions "-N Summary"
-
+    
     input:
     val genomes  // Triggers this process when all genome names are gathered (see 'workflow')
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 # This script builds a custome Kraken database.
-# Parameters: conda_module (module name for loading conda), env (conda environment), library (bacteria, etc), db (database name), wd (working directory), 
+# Parameters: conda_module (module name for loading conda), env (conda environment), library (bacteria, etc), db (database name), wd (working directory) 
 # Dependencies: conda (anaconda/miniconda), Kraken 2, PBS
 # Example command: qsub -v "conda_module=anaconda3/personal,env=kraken2.1,lib=bacteria,db=bacteria_220526,wd=$PWD" ~/Kraken_toolkit/build_kraken2_database.pbs
 #

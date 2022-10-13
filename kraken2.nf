@@ -19,7 +19,7 @@ the first item in the file list provided by --fastq ./reads/*_{1,2}.fastq.gz, ca
 [Declarations]
 Copyright (C) 2020-2022 Yu Wan <wanyuac@126.com>
 Licensed under the GNU General Public License v3.0
-Publication: 24 Mar 2020; last modification: 7 June 2022
+Publication: 24 Mar 2020; last modification: 14 October 2022
 */
 
 /*------------------------------------------------------------------------------
@@ -79,7 +79,7 @@ process bracken {
     """
     module load anaconda3/personal
     source activate ${params.conda_env}
-    ${params.bracken_dir}/bracken -d ${params.db} -i ${genome}_kraken.txt -o ${genome}_bracken.tsv -w ${genome}_bracken.txt -l S -r ${params.read_len} -t ${params.cpus}
+    ${params.bracken_dir}/bracken -d ${params.db} -i ${genome}_kraken.txt -o ${genome}_bracken.tsv -w ${genome}_bracken.txt -l ${params.bracken_level} -r ${params.read_len} -t ${params.cpus}
     """
 }
 

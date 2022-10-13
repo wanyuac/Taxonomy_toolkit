@@ -10,7 +10,7 @@ Run KmerFinder (installed in a Conda environment) over genome assemblies (*.fast
 
 [Use guide]
 An example command line in a screen session:
-nextflow -Djava.io.tmpdir=$PWD run kmerfinder.nf --db "$HOME/databases/kmerfinder/bacteria_220606/bacteria/bacteria.ATG" --tax "$HOME/databases/kmerfinder/bacteria_220606/bacteria/bacteria.tax" --outdir "${PWD}/output" --fasta "assemblies/*_.fasta" --queueSize 15 -c kmerfinder.config
+nextflow -Djava.io.tmpdir=$PWD run kmerfinder.nf --db "$HOME/databases/kmerfinder/bacteria_220606/bacteria/bacteria.ATG" --tax "$HOME/databases/kmerfinder/bacteria_220606/bacteria/bacteria.tax" --outdir "${PWD}/output" --fasta "assemblies/*.fasta" --queueSize 15 -c kmerfinder.config
 
 [Declarations]
 Copyright (C) 2020-2022 Yu Wan <wanyuac@126.com>

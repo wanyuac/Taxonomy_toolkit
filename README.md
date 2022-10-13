@@ -44,7 +44,7 @@ conda install -c bioconda bracken
     - `db`, name of the output database
     - `wd`, working directory
 - A minimum of 64 GB RAM and eight cores are required by this script because this step is memory-consuming and computation-intensive. You may edit the PBS header in the script to adjust the memory and CPU allocations. 
-- Example command: `qsub -v "conda_module=anaconda3/personal,env=kraken2.1,lib=bacteria,db=bacteria_220526,wd=$PWD" ~/Kraken_toolkit/build_database.pbs*`
+- Example command: `qsub -v "conda_module=anaconda3/personal,env=kraken2.1,lib=bacteria,db=bacteria_220526,wd=$PWD" ~/Kraken_toolkit/build_database.pbs`
 <br/>  
 
 ## 3. Building a Bracken database

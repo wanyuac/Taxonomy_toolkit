@@ -59,7 +59,7 @@ conda install -c bioconda bracken
     - `mod`, (optional) module name where conda/python is installed
     - `con`, (optional) name of the conda environment where Python is installed
 - By default, this script uses a 35-bp k-mer length and 100-bp read length. You may set arguments `k` and `len` to adjust the k-mer and read lengths, respectively.
-- Example command: `qsub -v "k=35,len=150,db=$HOME/database/kraken2/$db,x=$HOME/anaconda3/envs/kraken2.1/bin,p=$HOME/anaconda3/envs/kraken2.1/bin" build_bracken_database.pbs`
+- Example command: `qsub -v "k=35,len=150,db=$HOME/database/kraken2/$db,x=$HOME/anaconda3/envs/kraken2.1/bin,p=$HOME/anaconda3/envs/kraken2.1/bin" build_bracken_database.pbs`  
 <br/>  
 
 ## 4. Running the Kraken-Bracken Nextflow pipeline
@@ -87,7 +87,7 @@ nextflow -Djava.io.tmpdir=tmp run $HOME/software/Taxonomy_toolkit/kraken2.nf -c 
 
 Note that `-Djava.io.tmpdir=tmp` is not necessary if you have access to `/tmp` (Some system admins disabled such an access).
 
-Sometimes the jobs of Kraken2 are killed by the PBS when they are using memories exceeding those allocated, causing the workflow to pause, so please use `qstats` command to monitor job status.
+Sometimes the jobs of Kraken2 are killed by the PBS when they are using memories exceeding those allocated, causing the workflow to pause, so please use `qstats` command to monitor job status.  
 <br/>  
 
 ## 5. Running the KmerFinder Nextflow pipeline

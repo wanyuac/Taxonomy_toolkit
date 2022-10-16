@@ -88,7 +88,7 @@ nextflow -Djava.io.tmpdir=tmp run $HOME/software/Taxonomy_toolkit/kraken2.nf -c 
 Note that `-Djava.io.tmpdir=tmp` is not necessary if you have access to `/tmp` (Some system admins disabled such an access).
 
 Sometimes the jobs of Kraken2 are killed by the PBS when they are using memories exceeding those allocated, causing the workflow to pause, so please use `qstats` command to monitor job status.
-<br/>
+<br/>  
 
 ## 5. Running the KmerFinder Nextflow pipeline
 - Script `kmerfinder.nf` and its configuration file `kmerfinder.config`

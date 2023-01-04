@@ -4,11 +4,11 @@
 #             x (path to the 'bin' subdirectory in Kraken2's installation directory),
 #             p (directory where Bracken is installed), mod (module name where conda/python is installed - optional),
 #             con (name of the conda environment where Python is installed - optional)
-# Example command: qsub -v "k=35,len=150,db=$HOME/database/kraken2/bacteria_220526,x=$HOME/anaconda3/envs/kraken2.1/bin,p=$HOME/bin/Bracken,mod=anaconda3/personal,con=kraken2.1" build_bracken_database.pbs
+# Example command: qsub -v "k=35,len=150,db=$HOME/database/kraken2/bacteria_220526,x=$HOME/anaconda3/envs/kraken2.1/bin,p=$HOME/bin/Bracken,mod=anaconda3/personal,con=kraken2.1,wd=$PWD" build_bracken_database.pbs
 #
-# Copyright (C) 2020-2022 Yu Wan <wanyuac@126.com>
+# Copyright (C) 2020-2023 Yu Wan <wanyuac@126.com>
 # Licensed under the GNU General Public Licence version 3 (GPLv3) <https://www.gnu.org/licenses/>.
-# Release: 2020; latest update: 28 May 2022
+# Release: 2020; latest update: 4 Jan 2023
 
 ### Job configurations ###############
 #PBS -N bracken-build

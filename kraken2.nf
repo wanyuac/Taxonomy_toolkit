@@ -11,15 +11,15 @@ Run Kraken2 (installed in a Conda environment) and Bracken over gzip-compressed 
 
 [Use guide]
 An example command line in a screen session:
-nextflow -Djava.io.tmpdir=$PWD run kraken2.nf --db "./bacteria" --kraken2Dir "./kraken2/bin" --outdir "${PWD}/report" --fastq "./reads/*_{1,2}.fastq.gz" --queueSize 5 -c kraken2.config
+nextflow -Djava.io.tmpdir=$PWD run kraken2.nf --db "$HOME/database/bacteria_20220910" --outdir "${PWD}/report" --queueSize 5 --fastq "./reads/*_{1,2}.fastq.gz" --conda_env "kraken2.1" --bracken_dir "$HOME/bin/Bracken" --read_len 150 --script_dir "$HOME/bin/Taxonomy_toolkit" -c $HOME/bin/Taxonomy_toolkit/kraken2.config
 
 Note to use quote signs for paths, particularly, the paths of input read files, in this command line. Nextflow only reads
 the first item in the file list provided by --fastq ./reads/*_{1,2}.fastq.gz, causing an error to run the pipeline. 
 
 [Declarations]
-Copyright (C) 2020-2022 Yu Wan <wanyuac@126.com>
+Copyright (C) 2020-2023 Yu Wan <wanyuac@126.com>
 Licensed under the GNU General Public License v3.0
-Publication: 24 Mar 2020; last modification: 14 October 2022
+Publication: 24 Mar 2020; last modification: 4 Jan 2023
 */
 
 /*------------------------------------------------------------------------------

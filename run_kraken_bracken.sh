@@ -97,14 +97,14 @@ else
     check_dir "$dir_out/kraken"
     check_dir "$dir_out/bracken"
     echo "$(date) Pipeline parameters
-            Input directory: $dir_in
-            Output directory: $dir_out
-            Kraken2 database: $kraken_db
-            Bracken database: $bracken_db
-            Paired-end reads: $pe
-            Min. read length: $min_read_len
-            No. of threads: $threads
-            " > $LOG_file
+    Input directory: $dir_in
+    Output directory: $dir_out
+    Kraken2 database: $kraken_db
+    Bracken database: $bracken_db
+    Paired-end reads: $pe
+    Min. read length: $min_read_len
+    No. of threads: $threads
+    " > $LOG_file
 fi
 
 # Run Kraken2 and bracken ###############

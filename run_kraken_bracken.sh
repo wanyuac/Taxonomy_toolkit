@@ -24,6 +24,7 @@ display_parameters() {
       --bracken_db=*: directory of Bracken's database (mandatory)
       --se: a flag indicating input reads are single-end with filenames following the format [isolate name].fastq.gz (optional)
       --min_read_len=*: a uniform minimum length of all input reads (default: 50, a parameter for bracken)
+      --report=*: filename of the final report of top-3 taxa per sample in the tab-delimited format (default: top3_taxa.tsv)
       --threads=*: number of threads (default: 2)
     "
 }
@@ -57,6 +58,7 @@ pe=true
 dir_out='taxa'
 min_read_len=50
 LOG_file="$dir_out"/run_kraken_bracken.log
+report="top3_taxa.tsv"
 
 # Read customised parameters
 for arg in "$@"
@@ -79,6 +81,9 @@ do
         ;;
         --min_read_len=*)
         min_read_len="${arg#*=}"
+        ;;
+        --report=*)
+        report="${arg#*=}"
         ;;
         --threads=*)
         threads="${arg#*=}"
@@ -103,6 +108,7 @@ else
     Bracken database: $bracken_db
     Paired-end reads: $pe
     Min. read length: $min_read_len
+    Top-3 taxa report: $report
     No. of threads: $threads
     " > $LOG_file
 fi
@@ -171,5 +177,5 @@ do
     echo "$i" >> $isolate_list
 done
 
-python "$SCRIPT_DIR"/top3_bracken_taxa.py --list "$isolate_list" --dir "$bracken_output_root" --suffix '__bracken_sorted.tsv' --out "$bracken_output_root"/top3_taxa.tsv && \
+python "$SCRIPT_DIR"/top3_bracken_taxa.py --list "$isolate_list" --dir "$bracken_output_root" --suffix '_bracken_sorted.tsv' --out "$dir_out/$report" && \
 echo "$(date): The pipeline completed successfully." >> $LOG_file

@@ -118,18 +118,32 @@ then
             s=$( basename "$r1" '_1.fastq.gz' )
             isolates+=( "$s" )  # Add the isolate name into the array
             r2="$dir_in/${s}_2.fastq.gz"
-            echo "$(date): analysing paired-end reads of sample $s with Kraken2" >> $LOG_file
-            kraken2 --threads $threads --paired --gzip-compressed --db $kraken_db --report "$dir_out/kraken/${s}_kraken_sample_report.txt" --output - $r1 $r2
+            kraken_sample_report="$dir_out/kraken/${s}_kraken_sample_report.txt"
+            if [ -f "$kraken_sample_report" ]
+            then
+                echo "$(date): skip the kraken analysis for sample $s as its report $kraken_sample_report exists." >> $LOG_file
+            else
+                echo "$(date): analysing paired-end reads of sample $s with Kraken2" >> $LOG_file
+                kraken2 --threads $threads --paired --gzip-compressed --db $kraken_db --report "$kraken_sample_report" --output - $r1 $r2
+            fi
         done
     else  # Run kraken2 for single-end reads
         for r1 in "$dir_in"/*.fastq.gz
         do
             s=$( basename "$r1" '.fastq.gz' )
             isolates+=( "$s" )
-            echo "$(date): analysing single-end reads of sample $s with Kraken2" >> $LOG_file
-            kraken2 --threads $threads --gzip-compressed --db $kraken_db --report "$dir_out/kraken/${s}_kraken_sample_report.txt" --output - $r1
+            kraken_sample_report="$dir_out/kraken/${s}_kraken_sample_report.txt"
+            if [ -f "$kraken_sample_report" ]
+            then
+                echo "$(date): skip the kraken analysis for sample $s as its report $kraken_sample_report exists." >> $LOG_file
+            else
+                echo "$(date): analysing single-end reads of sample $s with Kraken2" >> $LOG_file
+                kraken2 --threads $threads --gzip-compressed --db $kraken_db --report "$dir_out/kraken/${s}_kraken_sample_report.txt" --output - $r1
+            fi
         done
     fi
+    echo "$(date): Kraken2 analysis completed." >> $LOG_file
+    echo "$(date): Start bracken analysis" >> $LOG_file
     for s in "${isolates[@]}"
     do
         kraken_report="$dir_out/kraken/${s}_kraken_sample_report.txt"
@@ -137,19 +151,20 @@ then
         if [ -f "$kraken_report" ]
         then
             echo "$(date): summarising species-level abundance of sample $s with bracken" >> $LOG_file
-            bracken -r $min_read_len -t $threads -d $braken_db -l S -i $kraken_report -o "$bracken_output_root/${s}_bracken.tsv" -w "$bracken_output_root/${s}_bracken.txt"
+            bracken -r $min_read_len -t $threads -d $bracken_db -l S -i $kraken_report -o "$bracken_output_root/${s}_bracken.tsv" -w "$bracken_output_root/${s}_bracken.txt"
             ( head -n 1 "$bracken_output_root/${s}_bracken.tsv" && tail -n +2 "$bracken_output_root/${s}_bracken.tsv" | sort -t$'\t' -k7 -n -r ) > "$bracken_output_root/${s}_bracken_sorted.tsv"
         else
             echo "$(date): warning from backen: skipped sample $s for the unavailability of $kraken_report" >> $LOG_file
         fi
     done
+    echo "$(date): bracken analysis completed." >> $LOG_file
 else
     echo "Error: input read directory $dir_in does not exist." >&2
     exit
 fi
 
 # compile bracken results ###############
-echo 'Compile bracken reports for top-3 taxa of each sample' >> $LOG_file
+echo "$(date): Compile bracken reports for top-3 taxa of each sample" >> $LOG_file
 isolate_list="$dir_out/isolates.txt"
 for i in "${isolates[@]}"
 do

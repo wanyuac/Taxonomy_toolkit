@@ -119,7 +119,7 @@ then
             isolates+=( "$s" )  # Add the isolate name into the array
             r2="$dir_in/${s}_2.fastq.gz"
             echo "$(date): analysing paired-end reads of sample $s with Kraken2" >> $LOG_file
-            kraken2 --threads $threads --paired --gzip-compressed --db $kraken_db --report "$dir_out/kraken/${s}_kraken_sample_report.txt" $r1 $r2
+            kraken2 --threads $threads --paired --gzip-compressed --db $kraken_db --report "$dir_out/kraken/${s}_kraken_sample_report.txt" --output - $r1 $r2
         done
     else  # Run kraken2 for single-end reads
         for r1 in "$dir_in"/*.fastq.gz
@@ -127,7 +127,7 @@ then
             s=$( basename "$r1" '.fastq.gz' )
             isolates+=( "$s" )
             echo "$(date): analysing single-end reads of sample $s with Kraken2" >> $LOG_file
-            kraken2 --threads $threads --gzip-compressed --db $kraken_db --report "$dir_out/kraken/${s}_kraken_sample_report.txt" $r1
+            kraken2 --threads $threads --gzip-compressed --db $kraken_db --report "$dir_out/kraken/${s}_kraken_sample_report.txt" --output - $r1
         done
     fi
     for s in "${isolates[@]}"

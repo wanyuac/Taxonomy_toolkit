@@ -21,8 +21,9 @@ from argparse import ArgumentParser
 def parse_argument():
     parser = ArgumentParser(description = "Extract top-three taxa and their read fractions for each sample from its TSV-formatted bracken report")
     parser.add_argument('-i', '--input', dest = 'input', type = str, nargs = '+', required = True, help = "Input TSV files from bracken.")
-    parser.add_argument('-s', '--suffix', dest = 'suffix', type = str, required = False, default = '__bracken_sorted.tsv', help = "Part of each input filename to be removed to extract the isolate name")
+    parser.add_argument('-s', '--suffix', dest = 'suffix', type = str, required = False, default = '__bracken_sorted.tsv', help = "Part of each input filename to be removed to extract the sample name")
     parser.add_argument('-o', '--out', dest = 'out', type = str, required = False, default = 'top3taxa.tsv', help = "Output filename and path")
+    parser.add_argument('-n', '--no-sort', dest = 'no_sort', action = "store_true", help = "Do not sort the result table by the abundance of top taxa across samples")
     return parser.parse_args()
 
 def main():
@@ -37,6 +38,8 @@ def main():
         new_line = pandas.DataFrame({'Sample' : [i], 'Taxon_1' : [r1['taxon']], 'Taxon_2' : [r2['taxon']], 'Taxon_3' : [r3['taxon']],\
                                      'Percent_1' : [float(r1['fraction'] * 100)], 'Percent_2' : [float(r2['fraction'] * 100)], 'Percent_3' : [float(r3['fraction'] * 100)]})
         report = pandas.concat([report, new_line], ignore_index = True)  # Replaces the depreciated method report.append(new_line)
+    if not args.no_sort:
+        report = report.sort_values(by = ['Percent_1', 'Taxon_1'], ascending = [False, False])
     report.to_csv(args.out, float_format = '%.3f', sep = '\t', header = True, index = False)  # float_format does not work on pandas v1.4.0+.
     return
 
